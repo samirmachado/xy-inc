@@ -1,8 +1,5 @@
-package br.com.samir.baas.test;
+package br.com.samir.baas.test.integration;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;
@@ -12,17 +9,21 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class BaasTests {
+public class IntegrationTest {
 
 	@LocalServerPort
-	int port;
-
+	protected int PORT;
+	
+	protected String BASE_URI_TO_TESTS = "http://localhost";
+	
 	@Autowired
-	private TestRestTemplate testRestTemplate;
-
-	@Test
-	public void getTest() {
-		String body = testRestTemplate.getForObject("http://localhost:"+port+"/teste/1", String.class);
-		assertEquals(body, "{}");
+	protected TestRestTemplate testRestTemplate;
+	
+	public <T> T get(String endPoint, Class<T> responseClass) {
+		return testRestTemplate.getForObject(createUri(endPoint), responseClass);
+	}
+	
+	private String createUri(String endPoint){
+		return BASE_URI_TO_TESTS+":"+PORT+endPoint;
 	}
 }

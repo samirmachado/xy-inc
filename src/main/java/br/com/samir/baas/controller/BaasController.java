@@ -1,4 +1,4 @@
-package br.com.samir.baas;
+package br.com.samir.baas.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
