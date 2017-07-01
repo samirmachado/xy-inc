@@ -24,7 +24,7 @@ public class BaasServiceTests{
 	@Test
 	public void findByTableAndIdTestIfCallTheRepositoryMethodCorrectly() {
 		String tableName = "table";
-		Long id = 1L;
+		String id = "1";
 		String expectedResult = "{}";
 		when(baasRepository.findById(tableName, id)).thenReturn(expectedResult);
 		

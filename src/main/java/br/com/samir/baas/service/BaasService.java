@@ -7,11 +7,11 @@ import br.com.samir.baas.repository.BaasRepository;
 
 @Service
 public class BaasService {
-	
+
 	@Autowired
-	private BaasRepository baasRepository; 
-	
-	public String findByTableAndId(String tableName, Long id){
+	private BaasRepository baasRepository;
+
+	public String findByTableAndId(String tableName, String id) {
 		return baasRepository.findById(tableName, id);
 	}
 }

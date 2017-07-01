@@ -3,41 +3,61 @@ package br.com.samir.baas.repository;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.BsonInvalidOperationException;
 import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-import com.mongodb.client.model.Filters;
 
 import br.com.samir.baas.database.Database;
+import br.com.samir.baas.exception.InvalidJsonObjectException;
 import br.com.samir.baas.exception.NonUniqueResultException;
 
 @Repository
 public class BaasRepository {
-	
-	@Autowired 
+
+	@Autowired
 	private Database database;
-	
-	public String findById(String tableName, Long id){
+
+	public String insert(String tableName, String jsonObject) {
+		MongoCollection<Document> collection = database.getDatabase().getCollection(tableName);
+		Document document = parseJsonToDocument(jsonObject);
+		collection.insertOne(document);
+		return document.toJson();
+	}
+
+	public String findById(String tableName, String id) {
+		Bson bsonObject = new Document().append("_id", new ObjectId(id));
 		MongoCursor<Document> iterator = database.getDatabase().getCollection(tableName)
-			.find(Filters.eq("id", id)).iterator();
+				.find(bsonObject ).iterator();
 		return createSingleJsonElement(iterator);
 	}
-	
-	private List<String> createListJsonElements(MongoCursor<Document> iterator){
-		List<String> jsonElements = new ArrayList<>();
-		while (iterator.hasNext()) {
-			jsonElements.add(iterator.next().toJson());
+
+	private Document parseJsonToDocument(String jsonObject) {
+		try {
+			return Document.parse(jsonObject);
+		} catch (BsonInvalidOperationException e) {
+			throw new InvalidJsonObjectException();
 		}
-		return jsonElements;
 	}
-	
-	private String createSingleJsonElement(MongoCursor<Document> iterator){
-		List<String> jsonElements = createListJsonElements(iterator);
-		if(jsonElements.size() > 1) {
+
+	private List<String> createListjsonObjects(MongoCursor<Document> iterator) {
+		List<String> jsonObjects = new ArrayList<>();
+		while (iterator.hasNext()) {
+			jsonObjects.add(iterator.next().toJson());
+		}
+		return jsonObjects;
+	}
+
+	private String createSingleJsonElement(MongoCursor<Document> iterator) {
+		List<String> jsonObjects = createListjsonObjects(iterator);
+		if (jsonObjects.size() > 1) {
 			throw new NonUniqueResultException();
 		}
-		return jsonElements.isEmpty() ? null : jsonElements.get(0);
+		return jsonObjects.isEmpty() ? null : jsonObjects.get(0);
 	}
 }

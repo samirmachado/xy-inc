@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import br.com.samir.baas.test.integration.IntegrationTest;
 
-public class BaasControllerTests extends IntegrationTest{
+public class BaasControllerTests extends IntegrationTest {
 
 	@Test
 	public void getTest() {
