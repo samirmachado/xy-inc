@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -33,6 +34,10 @@ public class IntegrationTest {
 	
 	public ResponseEntity<String> post(String endPoint, String jsonObject) {
 		return testRestTemplate.postForEntity(createUri(endPoint), jsonObject, String.class);
+	}
+	
+	public ResponseEntity<String> delete(String endPoint) {
+		return testRestTemplate.exchange(createUri(endPoint), HttpMethod.DELETE, null, String.class);
 	}
 	
 	public void clearDatabase() {

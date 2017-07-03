@@ -42,4 +42,13 @@ public class BaasServiceTests{
 		
 		assertEquals(jsonResponse, response);
 	}
+	
+	@Test(expected = NotFoundException.class)
+	public void removeByTableAndIdTestObjectNotFound() throws NotFoundException {
+		String tableName = "table";
+		String id = "1";
+		
+		when(baasRepository.remove(tableName, id)).thenReturn(false);
+		baasService.removeByTableAndId(tableName, id);
+	}
 }

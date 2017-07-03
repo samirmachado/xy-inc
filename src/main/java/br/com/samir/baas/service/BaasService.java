@@ -20,6 +20,13 @@ public class BaasService {
 		}
 		return jsonObject;
 	}
+	
+	public void removeByTableAndId(String tableName, String id) throws NotFoundException {
+		Boolean reponse = baasRepository.remove(tableName, id);
+		if(!reponse) {
+			throw new NotFoundException();
+		}
+	}
 
 	public String insert(String tableName, String jsonObject) throws InvalidJsonObjectException {
 		return baasRepository.insert(tableName, jsonObject);

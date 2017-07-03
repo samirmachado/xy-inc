@@ -1,7 +1,9 @@
 package br.com.samir.baas.test.unit.repository;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import org.bson.Document;
@@ -18,6 +20,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
 
 import br.com.samir.baas.database.Database;
 import br.com.samir.baas.exception.InvalidJsonObjectException;
@@ -47,6 +50,9 @@ public class BaasRepositoryTests {
 
 	@Mock
 	private Document documentValue;
+	
+	@Mock
+	private DeleteResult deleteResult;
 
 	@Test(expected = InvalidJsonObjectException.class)
 	public void insertTestWithInvalidJsonOject() throws InvalidJsonObjectException {
@@ -120,5 +126,33 @@ public class BaasRepositoryTests {
 
 		String result = baasRepository.findById(tableName, id);
 		assertNull(result);
+	}
+	
+	@Test
+	public void removeTestWithObjectFound() {
+		String tableName = "table";
+		String id = new ObjectId().toHexString();
+
+		when(database.getDatabase()).thenReturn(mongoDatabase);
+		when(mongoDatabase.getCollection(tableName)).thenReturn(mongoCollection);
+		when(mongoCollection.deleteOne(Mockito.any(Bson.class))).thenReturn(deleteResult);
+		when(deleteResult.getDeletedCount()).thenReturn(1L);
+
+		Boolean result = baasRepository.remove(tableName, id);
+		assertTrue(result);
+	}
+	
+	@Test
+	public void removeTestWithObjectNotFound() {
+		String tableName = "table";
+		String id = new ObjectId().toHexString();
+
+		when(database.getDatabase()).thenReturn(mongoDatabase);
+		when(mongoDatabase.getCollection(tableName)).thenReturn(mongoCollection);
+		when(mongoCollection.deleteOne(Mockito.any(Bson.class))).thenReturn(deleteResult);
+		when(deleteResult.getDeletedCount()).thenReturn(0L);
+
+		Boolean result = baasRepository.remove(tableName, id);
+		assertFalse(result);
 	}
 }

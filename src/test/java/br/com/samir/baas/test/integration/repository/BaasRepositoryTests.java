@@ -1,7 +1,6 @@
 package br.com.samir.baas.test.integration.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -61,5 +60,29 @@ public class BaasRepositoryTests extends IntegrationTest {
 		String foundObject = baasRepository.findById(tableName, jsonObjectId);
 		
 		assertNull(foundObject);
+	}
+	
+	@Test
+	public void removeTestWithObjectInDatabase() throws InvalidJsonObjectException {
+		String tableName = "table";
+		String jsonObject = new Document().append("name", "joão").toJson();
+		
+		String insertedJsonObject = baasRepository.insert(tableName, jsonObject);
+		String insertedJsonObjectId = Document.parse(insertedJsonObject).get("_id").toString();
+		Boolean response = baasRepository.remove(tableName, insertedJsonObjectId);
+		String foundObject = baasRepository.findById(tableName, insertedJsonObjectId);
+		
+		assertTrue(response);
+		assertNull(foundObject);
+	}
+	
+	@Test
+	public void removeTestWithNonExistentObjectInDatabase() {
+		String tableName = "table";
+		String jsonObjectId = new ObjectId().toHexString();
+
+		Boolean response = baasRepository.remove(tableName, jsonObjectId);
+		
+		assertFalse(response);
 	}
 }

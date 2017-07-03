@@ -20,9 +20,8 @@ public class BaasController {
 
 	@RequestMapping(value = { "/{tableName}/{id}" }, method = RequestMethod.GET)
 	public ResponseEntity<String> findById(@PathVariable("tableName") String tableName, @PathVariable("id") String id) {
-		String response;
 		try {
-			response = baasService.findByTableAndId(tableName, id);
+			String response = baasService.findByTableAndId(tableName, id);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (NotFoundException e) {
 			e.printStackTrace();
@@ -35,10 +34,23 @@ public class BaasController {
 	
 	@RequestMapping(value = { "/{tableName}" }, method = RequestMethod.POST)
 	public ResponseEntity<String> post(@PathVariable("tableName") String tableName, @RequestBody String jsonObject) {
-		String response;
 		try {
-			response = baasService.insert(tableName, jsonObject);
+			String response = baasService.insert(tableName, jsonObject);
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = { "/{tableName}/{id}" }, method = RequestMethod.DELETE)
+	public ResponseEntity<String> remove(@PathVariable("tableName") String tableName, @PathVariable("id") String id) {
+		try {
+			baasService.removeByTableAndId(tableName, id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (NotFoundException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

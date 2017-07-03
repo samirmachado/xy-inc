@@ -32,9 +32,15 @@ public class BaasRepository {
 
 	public String findById(String tableName, String id) {
 		Bson bsonObject = new Document().append("_id", new ObjectId(id));
-		MongoCursor<Document> iterator = database.getDatabase().getCollection(tableName)
-				.find(bsonObject ).iterator();
+		MongoCursor<Document> iterator = database.getDatabase().getCollection(tableName).find(bsonObject).iterator();
 		return createSingleJsonElement(iterator);
+	}
+
+	public Boolean remove(String tableName, String id) {
+		Bson bsonObject = new Document().append("_id", new ObjectId(id));
+		Long deletedCount = database.getDatabase().getCollection(tableName)
+				.deleteOne(bsonObject).getDeletedCount();
+		return deletedCount > 0 ? true : false;
 	}
 
 	private Document parseJsonToDocument(String jsonObject) throws InvalidJsonObjectException {
