@@ -1,6 +1,7 @@
 package br.com.samir.baas.test.integration.repository;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import br.com.samir.baas.database.Database;
 import br.com.samir.baas.exception.InvalidJsonObjectException;
+import br.com.samir.baas.exception.NotFoundException;
 import br.com.samir.baas.repository.BaasRepository;
 import br.com.samir.baas.test.integration.IntegrationTest;
 
@@ -41,7 +43,7 @@ public class BaasRepositoryTests extends IntegrationTest {
 	}
 
 	@Test
-	public void findByIdTestWithObjectInDatabase() throws InvalidJsonObjectException {
+	public void findByIdTestWithObjectInDatabase() throws InvalidJsonObjectException, NotFoundException {
 		String tableName = "table";
 		String jsonObject = new Document().append("name", "joão").toJson();
 		
@@ -53,7 +55,7 @@ public class BaasRepositoryTests extends IntegrationTest {
 	}
 	
 	@Test
-	public void findByIdTestWithNonExistentObjectInDatabase() {
+	public void findByIdTestWithNonExistentObjectInDatabase() throws NotFoundException {
 		String tableName = "table";
 		String jsonObjectId = new ObjectId().toHexString();
 
@@ -63,26 +65,55 @@ public class BaasRepositoryTests extends IntegrationTest {
 	}
 	
 	@Test
-	public void removeTestWithObjectInDatabase() throws InvalidJsonObjectException {
+	public void removeTestWithObjectInDatabase() throws InvalidJsonObjectException, NotFoundException {
 		String tableName = "table";
 		String jsonObject = new Document().append("name", "joão").toJson();
 		
 		String insertedJsonObject = baasRepository.insert(tableName, jsonObject);
 		String insertedJsonObjectId = Document.parse(insertedJsonObject).get("_id").toString();
-		Boolean response = baasRepository.remove(tableName, insertedJsonObjectId);
+		baasRepository.remove(tableName, insertedJsonObjectId);
 		String foundObject = baasRepository.findById(tableName, insertedJsonObjectId);
 		
-		assertTrue(response);
 		assertNull(foundObject);
 	}
 	
-	@Test
-	public void removeTestWithNonExistentObjectInDatabase() {
+	@Test(expected = NotFoundException.class)
+	public void removeTestWithNonExistentObjectInDatabase() throws NotFoundException {
 		String tableName = "table";
 		String jsonObjectId = new ObjectId().toHexString();
 
-		Boolean response = baasRepository.remove(tableName, jsonObjectId);
+		baasRepository.remove(tableName, jsonObjectId);
+	}
+	
+	@Test
+	public void updateTestWithObjectInDatabase() throws InvalidJsonObjectException, NotFoundException {
+		String tableName = "table";
+		String originalValueName = "João";
+		String updatedValueName = "Maria";
+		Integer age = 18;
+		String jsonObject = new Document().append("name", originalValueName).append("age", age).toJson();
 		
-		assertFalse(response);
+		String insertedJsonObject = baasRepository.insert(tableName, jsonObject);
+		String insertedJsonObjectId = Document.parse(insertedJsonObject).get("_id").toString();
+		
+		String originalObjectInDatabase = baasRepository.findById(tableName, insertedJsonObjectId);
+		String objectToUpdate = Document.parse(originalObjectInDatabase).append("name", updatedValueName).toJson();
+		
+		baasRepository.update(tableName, objectToUpdate, insertedJsonObjectId);
+		String updatedObjectInDatabase = baasRepository.findById(tableName, insertedJsonObjectId);
+		
+		assertEquals(originalValueName, Document.parse(originalObjectInDatabase).get("name"));
+		assertEquals(age, Document.parse(originalObjectInDatabase).get("age"));
+		assertEquals(updatedValueName, Document.parse(updatedObjectInDatabase).get("name"));
+		assertEquals(age, Document.parse(updatedObjectInDatabase).get("age"));
+	}
+	
+	@Test(expected = NotFoundException.class)
+	public void upateTestWithNonExistentObjectInDatabase() throws NotFoundException, InvalidJsonObjectException {
+		String tableName = "table";
+		String jsonObjectId = new ObjectId().toHexString();
+		String objectToUpdate = new Document().append("_id", jsonObjectId).append("name", "joão").toJson();
+		
+		baasRepository.update(tableName, objectToUpdate, jsonObjectId);
 	}
 }

@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import br.com.samir.baas.exception.InvalidJsonObjectException;
+import br.com.samir.baas.exception.NotFoundException;
 import br.com.samir.baas.repository.BaasRepository;
 import br.com.samir.baas.test.integration.IntegrationTest;
 
@@ -50,7 +51,7 @@ public class BaasControllerTests extends IntegrationTest {
 	}
 	
 	@Test
-	public void postTest() throws InvalidJsonObjectException {
+	public void postTest() throws InvalidJsonObjectException, NotFoundException {
 		String tableName = "table";
 		String jsonObject = new Document().append("name", "joão").toJson();
 		
@@ -80,6 +81,31 @@ public class BaasControllerTests extends IntegrationTest {
 		String jsonObjectId = new ObjectId().toHexString();
 		
 		ResponseEntity<String> response = delete("/"+tableName+"/"+jsonObjectId);
+		
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+	}
+	
+	@Test
+	public void updateTest() throws InvalidJsonObjectException {
+		String tableName = "table";
+		String jsonObject = new Document().append("name", "João").toJson();
+		
+		String insertedJsonObject = baasRepository.insert(tableName, jsonObject);
+		String objectToUpdate = Document.parse(insertedJsonObject).append("name", "Maria").toJson();
+		String objectToUpdateId = Document.parse(objectToUpdate).get("_id").toString();
+		
+		ResponseEntity<String> response = update("/"+tableName+"/"+objectToUpdateId, objectToUpdate);
+		
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+	}
+	
+	@Test
+	public void updateTestWithObjectNotFound() {
+		String tableName = "table";
+		String jsonObjectId = new ObjectId().toHexString();
+		String objectToUpdate = new Document().append("_id", jsonObjectId).append("name", "joão").toJson();
+		String objectToUpdateId = Document.parse(objectToUpdate).get("_id").toString();
+		ResponseEntity<String> response = update("/"+tableName+"/"+objectToUpdateId, objectToUpdate);
 		
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 	}

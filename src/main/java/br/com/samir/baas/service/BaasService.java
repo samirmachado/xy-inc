@@ -22,13 +22,14 @@ public class BaasService {
 	}
 	
 	public void removeByTableAndId(String tableName, String id) throws NotFoundException {
-		Boolean reponse = baasRepository.remove(tableName, id);
-		if(!reponse) {
-			throw new NotFoundException();
-		}
+		baasRepository.remove(tableName, id);
 	}
 
 	public String insert(String tableName, String jsonObject) throws InvalidJsonObjectException {
 		return baasRepository.insert(tableName, jsonObject);
+	}
+	
+	public void update(String tableName, String jsonObject, String id) throws InvalidJsonObjectException, NotFoundException {
+		baasRepository.update(tableName, jsonObject, id);
 	}
 }

@@ -56,4 +56,19 @@ public class BaasController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@RequestMapping(value = { "/{tableName}/{id}" }, method = RequestMethod.PUT)
+	public ResponseEntity<String> update(@PathVariable("tableName") String tableName, @PathVariable("id") String id,
+			@RequestBody String jsonObject) {
+		try {
+			baasService.update(tableName, jsonObject, id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (NotFoundException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

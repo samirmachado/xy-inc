@@ -1,9 +1,7 @@
 package br.com.samir.baas.test.unit.repository;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import org.bson.Document;
@@ -21,10 +19,12 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 
 import br.com.samir.baas.database.Database;
 import br.com.samir.baas.exception.InvalidJsonObjectException;
 import br.com.samir.baas.exception.NonUniqueResultException;
+import br.com.samir.baas.exception.NotFoundException;
 import br.com.samir.baas.repository.BaasRepository;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -53,6 +53,9 @@ public class BaasRepositoryTests {
 	
 	@Mock
 	private DeleteResult deleteResult;
+	
+	@Mock
+	private UpdateResult updateResult;
 
 	@Test(expected = InvalidJsonObjectException.class)
 	public void insertTestWithInvalidJsonOject() throws InvalidJsonObjectException {
@@ -79,7 +82,7 @@ public class BaasRepositoryTests {
 	}
 
 	@Test(expected = NonUniqueResultException.class)
-	public void findByIdTestWithQueryReturningTwoResults() {
+	public void findByIdTestWithQueryReturningTwoResults() throws NotFoundException {
 		String tableName = "table";
 		String id = new ObjectId().toHexString();
 
@@ -95,7 +98,7 @@ public class BaasRepositoryTests {
 	}
 
 	@Test
-	public void findByIdTestWithQueryReturningOneResult() {
+	public void findByIdTestWithQueryReturningOneResult() throws NotFoundException {
 		String tableName = "table";
 		String id = new ObjectId().toHexString();
 		String expectedValue = "{}";
@@ -113,7 +116,7 @@ public class BaasRepositoryTests {
 	}
 
 	@Test
-	public void findByIdTestWithQueryReturningEmpty() {
+	public void findByIdTestWithQueryReturningEmpty() throws NotFoundException {
 		String tableName = "table";
 		String id = new ObjectId().toHexString();
 
@@ -128,22 +131,16 @@ public class BaasRepositoryTests {
 		assertNull(result);
 	}
 	
-	@Test
-	public void removeTestWithObjectFound() {
+	@Test(expected = NotFoundException.class)
+	public void findByIdTestWithIdNull() throws NotFoundException {
 		String tableName = "table";
-		String id = new ObjectId().toHexString();
 
-		when(database.getDatabase()).thenReturn(mongoDatabase);
-		when(mongoDatabase.getCollection(tableName)).thenReturn(mongoCollection);
-		when(mongoCollection.deleteOne(Mockito.any(Bson.class))).thenReturn(deleteResult);
-		when(deleteResult.getDeletedCount()).thenReturn(1L);
-
-		Boolean result = baasRepository.remove(tableName, id);
-		assertTrue(result);
+		String result = baasRepository.findById(tableName, null);
+		assertNull(result);
 	}
 	
-	@Test
-	public void removeTestWithObjectNotFound() {
+	@Test(expected = NotFoundException.class)
+	public void removeTestWithObjectNotFound() throws NotFoundException {
 		String tableName = "table";
 		String id = new ObjectId().toHexString();
 
@@ -152,7 +149,45 @@ public class BaasRepositoryTests {
 		when(mongoCollection.deleteOne(Mockito.any(Bson.class))).thenReturn(deleteResult);
 		when(deleteResult.getDeletedCount()).thenReturn(0L);
 
-		Boolean result = baasRepository.remove(tableName, id);
-		assertFalse(result);
+		baasRepository.remove(tableName, id);
+	}
+	
+	@Test(expected = NotFoundException.class)
+	public void removeTestWithIdNull() throws NotFoundException {
+		String tableName = "table";
+
+		when(database.getDatabase()).thenReturn(mongoDatabase);
+		when(mongoDatabase.getCollection(tableName)).thenReturn(mongoCollection);
+		when(mongoCollection.deleteOne(Mockito.any(Bson.class))).thenReturn(deleteResult);
+
+		baasRepository.remove(tableName, null);
+	}
+	
+	@Test(expected = NotFoundException.class)
+	public void updateTestWithObjectNotFound() throws InvalidJsonObjectException, NotFoundException {
+		String tableName = "table";
+		String objectId = new ObjectId().toHexString();
+		String jsonObject = new Document().append("_id", objectId )
+				.append("name", "joão").toJson();
+
+		when(database.getDatabase()).thenReturn(mongoDatabase);
+		when(mongoDatabase.getCollection(tableName)).thenReturn(mongoCollection);
+		when(mongoCollection.replaceOne(Mockito.any(Bson.class), Mockito.any(Document.class))).thenReturn(updateResult);
+		when(updateResult.getModifiedCount()).thenReturn(0L);
+
+		baasRepository.update(tableName, jsonObject, objectId);
+	}
+	
+	@Test(expected = NotFoundException.class)
+	public void updateTestWithObjectMissingId() throws InvalidJsonObjectException, NotFoundException {
+		String tableName = "table";
+		String objectId = new ObjectId().toHexString();
+		String jsonObject = new Document().append("name", "joão").toJson();
+
+		when(database.getDatabase()).thenReturn(mongoDatabase);
+		when(mongoDatabase.getCollection(tableName)).thenReturn(mongoCollection);
+		when(mongoCollection.replaceOne(Mockito.any(Bson.class), Mockito.any(Document.class))).thenReturn(updateResult);
+
+		baasRepository.update(tableName, jsonObject, objectId);
 	}
 }
