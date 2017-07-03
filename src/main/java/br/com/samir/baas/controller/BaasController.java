@@ -1,5 +1,7 @@
 package br.com.samir.baas.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,20 @@ public class BaasController {
 	public ResponseEntity<String> findById(@PathVariable("tableName") String tableName, @PathVariable("id") String id) {
 		try {
 			String response = baasService.findByTableAndId(tableName, id);
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (NotFoundException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = { "/{tableName}" }, method = RequestMethod.GET)
+	public ResponseEntity<List<String>> list(@PathVariable("tableName") String tableName) {
+		try {
+			List<String> response = baasService.list(tableName);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (NotFoundException e) {
 			e.printStackTrace();

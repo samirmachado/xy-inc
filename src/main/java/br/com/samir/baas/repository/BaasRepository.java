@@ -58,6 +58,11 @@ public class BaasRepository {
 		}
 	}
 	
+	public List<String> list(String tableName) {
+		MongoCursor<Document> iterator = database.getDatabase().getCollection(tableName).find().iterator();
+		return createListjsonObjects(iterator);
+	}
+	
 	private Bson createBsonObjectWithId(String id) throws NotFoundException {
 		if(StringUtils.isBlank(id)) {
 			throw new NotFoundException();

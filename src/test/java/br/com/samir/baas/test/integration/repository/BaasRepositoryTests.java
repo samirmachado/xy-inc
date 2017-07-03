@@ -2,6 +2,9 @@ package br.com.samir.baas.test.integration.repository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -115,5 +118,31 @@ public class BaasRepositoryTests extends IntegrationTest {
 		String objectToUpdate = new Document().append("_id", jsonObjectId).append("name", "joão").toJson();
 		
 		baasRepository.update(tableName, objectToUpdate, jsonObjectId);
+	}
+	
+	@Test
+	public void listTest() throws InvalidJsonObjectException {
+		String tableName = "table";
+		String jsonObjectOne = new Document().append("name", "joão").toJson();
+		String jsonObjectTwo = new Document().append("name", "Tereza").toJson();
+		
+		baasRepository.insert(tableName, jsonObjectOne);
+		baasRepository.insert(tableName, jsonObjectTwo);
+		List<String> objectsInDatabase = baasRepository.list(tableName);
+		
+		assertEquals(2, objectsInDatabase.size());
+		objectsInDatabase.forEach(item -> {
+			String name = Document.parse(item).getString("name");
+			assertTrue(name.equals("joão") || name.equals("Tereza"));
+		});
+	}
+	
+	@Test
+	public void listTestWithEmptyCollection() {
+		String tableName = "table";
+		
+		List<String> objectsInDatabase = baasRepository.list(tableName);
+		
+		assertEquals(0, objectsInDatabase.size());
 	}
 }

@@ -1,7 +1,9 @@
 package br.com.samir.baas.test.unit.service;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +23,9 @@ public class BaasServiceTests{
 	
 	@Mock
 	private BaasRepository baasRepository;
+	
+	@Mock
+	private List<String> listOfString;
 
 	@Test(expected = NotFoundException.class)
 	public void findByTableAndIdTestObjectNotFound() throws NotFoundException {
@@ -31,15 +36,11 @@ public class BaasServiceTests{
 		baasService.findByTableAndId(tableName, id);
 	}
 	
-	@Test
-	public void findByTableAndIdTestObjectFound() throws NotFoundException {
+	@Test(expected = NotFoundException.class)
+	public void listTestObjectNotFound() throws NotFoundException {
 		String tableName = "table";
-		String id = "1";
-		String jsonResponse = "{}";
 		
-		when(baasRepository.findById(tableName, id)).thenReturn(jsonResponse);
-		String response = baasService.findByTableAndId(tableName, id);
-		
-		assertEquals(jsonResponse, response);
+		when(baasRepository.list(tableName)).thenReturn(new ArrayList<String>());
+		baasService.list(tableName);
 	}
 }

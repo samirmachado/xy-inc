@@ -1,5 +1,7 @@
 package br.com.samir.baas.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +33,13 @@ public class BaasService {
 	
 	public void update(String tableName, String jsonObject, String id) throws InvalidJsonObjectException, NotFoundException {
 		baasRepository.update(tableName, jsonObject, id);
+	}
+	
+	public List<String> list(String tableName) throws NotFoundException {
+		List<String> objects = baasRepository.list(tableName);
+		if(objects==null || objects.isEmpty()) {
+			throw new NotFoundException();
+		}
+		return objects;
 	}
 }

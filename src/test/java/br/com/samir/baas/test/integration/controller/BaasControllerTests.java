@@ -109,4 +109,26 @@ public class BaasControllerTests extends IntegrationTest {
 		
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 	}
+	
+	@Test
+	public void listTest() throws InvalidJsonObjectException {
+		String tableName = "table";
+		String jsonObjectOne = new Document().append("name", "joão").toJson();
+		String jsonObjectTwo = new Document().append("name", "Tereza").toJson();
+		
+		baasRepository.insert(tableName, jsonObjectOne);
+		baasRepository.insert(tableName, jsonObjectTwo);	
+		ResponseEntity<String> response = get("/"+tableName);
+		
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+	}
+	
+	@Test
+	public void listTestWithEmptyCollection() throws InvalidJsonObjectException {
+		String tableName = "table";
+
+		ResponseEntity<String> response = get("/"+tableName);
+		
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+	}
 }
