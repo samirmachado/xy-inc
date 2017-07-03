@@ -15,4 +15,8 @@ public class Database {
 	public MongoDatabase getDatabase() {
 		return mongoClient.getDatabase("database");
 	}
+
+	public void clear() {
+		getDatabase().drop();
+	}
 }

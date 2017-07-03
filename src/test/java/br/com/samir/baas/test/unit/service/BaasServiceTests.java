@@ -1,7 +1,7 @@
 package br.com.samir.baas.test.unit.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import br.com.samir.baas.exception.NotFoundException;
 import br.com.samir.baas.repository.BaasRepository;
 import br.com.samir.baas.service.BaasService;
 
@@ -21,16 +22,24 @@ public class BaasServiceTests{
 	@Mock
 	private BaasRepository baasRepository;
 
-	@Test
-	public void findByTableAndIdTestIfCallTheRepositoryMethodCorrectly() {
+	@Test(expected = NotFoundException.class)
+	public void findByTableAndIdTestObjectNotFound() throws NotFoundException {
 		String tableName = "table";
 		String id = "1";
-		String expectedResult = "{}";
-		when(baasRepository.findById(tableName, id)).thenReturn(expectedResult);
 		
-		String result = baasService.findByTableAndId(tableName, id);
+		when(baasRepository.findById(tableName, id)).thenReturn(null);
+		baasService.findByTableAndId(tableName, id);
+	}
+	
+	@Test
+	public void findByTableAndIdTestObjectFound() throws NotFoundException {
+		String tableName = "table";
+		String id = "1";
+		String jsonResponse = "{}";
 		
-		verify(baasRepository, times(1)).findById(tableName, id);
-		assertEquals(expectedResult, result);
+		when(baasRepository.findById(tableName, id)).thenReturn(jsonResponse);
+		String response = baasService.findByTableAndId(tableName, id);
+		
+		assertEquals(jsonResponse, response);
 	}
 }

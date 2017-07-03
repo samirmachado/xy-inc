@@ -6,10 +6,12 @@ import static org.junit.Assert.assertNull;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import br.com.samir.baas.database.Database;
+import br.com.samir.baas.exception.InvalidJsonObjectException;
 import br.com.samir.baas.repository.BaasRepository;
 import br.com.samir.baas.test.integration.IntegrationTest;
 
@@ -21,8 +23,13 @@ public class BaasRepositoryTests extends IntegrationTest {
 	@Autowired
 	Database database;
 	
+	@Before
+	public void testSetup() {
+		clearDatabase();
+	}
+	
 	@Test
-	public void insertTest() {
+	public void insertTest() throws InvalidJsonObjectException {
 		String tableName = "table";
 		String jsonObject = new Document().append("name", "joão").toJson();
 		
@@ -35,7 +42,7 @@ public class BaasRepositoryTests extends IntegrationTest {
 	}
 
 	@Test
-	public void findByIdTestWithObjectInDatabase() {
+	public void findByIdTestWithObjectInDatabase() throws InvalidJsonObjectException {
 		String tableName = "table";
 		String jsonObject = new Document().append("name", "joão").toJson();
 		
@@ -49,9 +56,9 @@ public class BaasRepositoryTests extends IntegrationTest {
 	@Test
 	public void findByIdTestWithNonExistentObjectInDatabase() {
 		String tableName = "table";
-		String insertedJsonObjectId = new ObjectId().toHexString();
+		String jsonObjectId = new ObjectId().toHexString();
 
-		String foundObject = baasRepository.findById(tableName, insertedJsonObjectId);
+		String foundObject = baasRepository.findById(tableName, jsonObjectId);
 		
 		assertNull(foundObject);
 	}

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -48,7 +49,7 @@ public class BaasRepositoryTests {
 	private Document documentValue;
 
 	@Test(expected = InvalidJsonObjectException.class)
-	public void insertTestWithInvalidJsonOject() {
+	public void insertTestWithInvalidJsonOject() throws InvalidJsonObjectException {
 		String tableName = "table";
 		String jsonObject = new Document().append("name", "joão").toJson();
 		String invalidJsonObject = jsonObject.substring(2);
@@ -60,7 +61,7 @@ public class BaasRepositoryTests {
 	}
 
 	@Test
-	public void insertTestWithValidJsonOject() {
+	public void insertTestWithValidJsonOject() throws InvalidJsonObjectException {
 		String tableName = "table";
 		String jsonObject = new Document().append("name", "joão").toJson();
 
@@ -74,7 +75,7 @@ public class BaasRepositoryTests {
 	@Test(expected = NonUniqueResultException.class)
 	public void findByIdTestWithQueryReturningTwoResults() {
 		String tableName = "table";
-		String id = "1";
+		String id = new ObjectId().toHexString();
 
 		when(database.getDatabase()).thenReturn(mongoDatabase);
 		when(mongoDatabase.getCollection(tableName)).thenReturn(mongoCollection);
@@ -90,7 +91,7 @@ public class BaasRepositoryTests {
 	@Test
 	public void findByIdTestWithQueryReturningOneResult() {
 		String tableName = "table";
-		String id = "1";
+		String id = new ObjectId().toHexString();
 		String expectedValue = "{}";
 
 		when(database.getDatabase()).thenReturn(mongoDatabase);
@@ -108,7 +109,7 @@ public class BaasRepositoryTests {
 	@Test
 	public void findByIdTestWithQueryReturningEmpty() {
 		String tableName = "table";
-		String id = "1";
+		String id = new ObjectId().toHexString();
 
 		when(database.getDatabase()).thenReturn(mongoDatabase);
 		when(mongoDatabase.getCollection(tableName)).thenReturn(mongoCollection);

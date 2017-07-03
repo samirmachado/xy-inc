@@ -23,7 +23,7 @@ public class BaasRepository {
 	@Autowired
 	private Database database;
 
-	public String insert(String tableName, String jsonObject) {
+	public String insert(String tableName, String jsonObject) throws InvalidJsonObjectException {
 		MongoCollection<Document> collection = database.getDatabase().getCollection(tableName);
 		Document document = parseJsonToDocument(jsonObject);
 		collection.insertOne(document);
@@ -37,7 +37,7 @@ public class BaasRepository {
 		return createSingleJsonElement(iterator);
 	}
 
-	private Document parseJsonToDocument(String jsonObject) {
+	private Document parseJsonToDocument(String jsonObject) throws InvalidJsonObjectException {
 		try {
 			return Document.parse(jsonObject);
 		} catch (BsonInvalidOperationException e) {
