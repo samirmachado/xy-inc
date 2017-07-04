@@ -74,8 +74,7 @@ Resposta:
 
 StatusCode: 200 OK
 ###### GET
-http://localhost:8080/user/595aad7e687e7b0abe27cb13
-
+http://localhost:8080/user
 Resposta:
 ```json
 [
