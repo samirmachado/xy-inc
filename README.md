@@ -17,8 +17,10 @@ A aplicação permite as requisições básicas de CRUD da sequinte maneira:
 * GET /xxx/{id} - Busca um registro do modelo XXX por id
 * DELETE /xxx/{id} - Deleta um registo do modelo XXX
 * POST /xxx - Cria um novo registro do modelo XXX
+
     {"prop1":"value1", "prop2":"value2"}
 * PUT /xxx/{id} - Edita um registro do modelo XXX
+
     {"prop1":"value1", "prop2":"value2"}
 
 Observações: 
@@ -35,6 +37,7 @@ $ ./run-tests.sh
 Testes realizados utilizando o POSTMAN:
 ###### POST
 http://localhost:8080/user
+
 Body:
 ```json
 {
@@ -49,6 +52,7 @@ Resposta:
 StatusCode: 201 CREATED
 ###### GET
 http://localhost:8080/user/595aad7e687e7b0abe27cb13
+
 Resposta:
 ```json
 { "_id" : { "$oid" : "595aad7e687e7b0abe27cb13" }, "name" : "João", "age" : 18}
@@ -56,6 +60,7 @@ Resposta:
 StatusCode: 200 OK
 ###### PUT
 http://localhost:8080/user/595aad7e687e7b0abe27cb13
+
 Body:
 ```json
 {
@@ -64,10 +69,13 @@ Body:
 	"email":"joao@email.com"
 }
 ```
+
 Resposta:
+
 StatusCode: 200 OK
 ###### GET
 http://localhost:8080/user/595aad7e687e7b0abe27cb13
+
 Resposta:
 ```json
 [
