@@ -40,15 +40,15 @@ public class BaasService {
 		if(objects==null || objects.isEmpty()) {
 			throw new NotFoundException();
 		}
-		return convertToListOfObjects(objects);
+		return convertToJsonArray(objects);
 	}
 	
-	private String convertToListOfObjects(List<String> jsonList) {
-		if(jsonList==null || jsonList.isEmpty()) {
+	private String convertToJsonArray(List<String> objects) {
+		if(objects==null || objects.isEmpty()) {
 			return "[]";
 		}
 		String jsonArray = "[";
-		for (String jsonValue : jsonList) {
+		for (String jsonValue : objects) {
 			jsonArray = jsonArray.concat(jsonValue).concat(",");
 		}
 		return jsonArray.substring(0, jsonArray.length()-1).concat("]");
