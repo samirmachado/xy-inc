@@ -1,7 +1,5 @@
 package br.com.samir.baas.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,10 +33,10 @@ public class BaasController {
 	}
 	
 	@RequestMapping(value = { "/{tableName}" }, method = RequestMethod.GET)
-	public ResponseEntity<List<String>> list(@PathVariable("tableName") String tableName) {
+	public ResponseEntity<?> list(@PathVariable("tableName") String tableName) {
 		try {
-			List<String> response = baasService.list(tableName);
-			return new ResponseEntity<>(response, HttpStatus.OK);
+			String jsonList = baasService.list(tableName);
+			return new ResponseEntity<>(jsonList, HttpStatus.OK);
 		} catch (NotFoundException e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

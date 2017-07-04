@@ -28,7 +28,7 @@ public class BaasServiceTests{
 	private List<String> listOfString;
 
 	@Test(expected = NotFoundException.class)
-	public void findByTableAndIdTestObjectNotFound() throws NotFoundException {
+	public void findByTableAndIdTestWithObjectNotFound() throws NotFoundException {
 		String tableName = "table";
 		String id = "1";
 		
@@ -37,7 +37,7 @@ public class BaasServiceTests{
 	}
 	
 	@Test(expected = NotFoundException.class)
-	public void listTestObjectNotFound() throws NotFoundException {
+	public void listTestWithObjectNotFound() throws NotFoundException {
 		String tableName = "table";
 		
 		when(baasRepository.list(tableName)).thenReturn(new ArrayList<String>());

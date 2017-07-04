@@ -2,6 +2,9 @@ package br.com.samir.baas.test.integration.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -10,6 +13,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.util.JSON;
 
 import br.com.samir.baas.exception.InvalidJsonObjectException;
 import br.com.samir.baas.exception.NotFoundException;
@@ -121,6 +127,12 @@ public class BaasControllerTests extends IntegrationTest {
 		ResponseEntity<String> response = get("/"+tableName);
 		
 		assertEquals(HttpStatus.OK, response.getStatusCode());
+		
+		@SuppressWarnings("unchecked")
+		List<BasicDBObject> dbObject = (List<BasicDBObject>) JSON.parse(response.getBody());
+		dbObject.forEach(x -> {
+			assertTrue(Document.parse(x.toString()).containsKey("name"));
+		});
 	}
 	
 	@Test
